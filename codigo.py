@@ -5,14 +5,13 @@ import random
 # ---------------------------
 class BombaInfusionInteligente:
     def __init__(self):
-        self.__velocidad = 0 # ml/h
+        self.__velocidad = 0  # ml/h
         self.__volumenRestante = 0  # ml
         self.__tipoInfusion = ""
         self.__estado = "Detenida"
         self.__umbralMaximo = 0
         self.__umbralMinimo = 0
 
-    # Método para configurar la infusión
     def configurarInfusion(self, tipo, velocidad, volumen, umbralMin, umbralMax):
         if velocidad <= 0 or volumen <= 0 or umbralMin < 0 or umbralMax < 0:
             print("[ERROR] Parámetros inválidos: deben ser valores positivos.")
@@ -20,8 +19,7 @@ class BombaInfusionInteligente:
         if umbralMin >= umbralMax:
             print("[ERROR] El umbral mínimo debe ser menor que el umbral máximo.")
             return
-    
-    # Método para iniciar la infusión
+
         self.__tipoInfusion = tipo
         self.__velocidad = velocidad
         self.__volumenRestante = volumen
@@ -30,7 +28,6 @@ class BombaInfusionInteligente:
         self.__actualizarEstado()
         print(f"[CONFIG] Infusión '{tipo}' configurada a {velocidad} ml/h.")
 
-    # Método para iniciar la infusión
     def iniciar(self):
         if self.__estado != "Detenida":
             print("[INFO] La bomba ya está funcionando.")
@@ -38,12 +35,10 @@ class BombaInfusionInteligente:
             self.__estado = "Funcionando"
             print("[INICIO] Bomba iniciada.")
 
-    # Método para detener la infusión
-    def detener(self):   
+    def detener(self):
         self.__estado = "Detenida"
         print("[DETENCIÓN] Bomba detenida.")
 
-    # Método privado para actualizar el estado
     def __actualizarEstado(self):
         if self.__velocidad < self.__umbralMinimo or self.__velocidad > self.__umbralMaximo:
             self.__estado = "Alerta"
@@ -54,7 +49,6 @@ class BombaInfusionInteligente:
         else:
             self.__estado = "Lista"
 
-    # Método para ajustar la velocidad
     def ajustarVelocidad(self, nuevaVelocidad):
         print(f"[AJUSTE] Intentando ajustar velocidad a {nuevaVelocidad} ml/h...")
         if self.__umbralMinimo <= nuevaVelocidad <= self.__umbralMaximo:
@@ -63,8 +57,7 @@ class BombaInfusionInteligente:
             print("[OK] Velocidad ajustada.")
         else:
             print("[ERROR] Fuera de límites permitidos.")
- 
-    # Método para obtener información general
+
     def obtenerInformacion(self):
         return {
             "Tipo de infusión": (self.__tipoInfusion, ""),
@@ -77,6 +70,7 @@ class BombaInfusionInteligente:
 
     def getVelocidad(self):
         return self.__velocidad
+
 
 # ---------------------------
 # Clase: SensorBiologico (abstracta)
@@ -106,8 +100,9 @@ class SensorBiologico:
     def getValorActual(self):
         return self._valorActual
 
+
 # ---------------------------
-# Subclase: SensorGlucosa
+# Subclases de SensorBiologico
 # ---------------------------
 class SensorGlucosa(SensorBiologico):
     def __init__(self):
@@ -133,9 +128,7 @@ class SensorGlucosa(SensorBiologico):
     def necesitaInsulina(self):
         return self._valorActual > self.__umbralHiperglucemia
 
-# ---------------------------
-# Subclase: SensorFrecuenciaCardiaca
-# ---------------------------
+
 class SensorFrecuenciaCardiaca(SensorBiologico):
     def __init__(self):
         super().__init__("Frecuencia cardíaca", "bpm")
@@ -163,9 +156,7 @@ class SensorFrecuenciaCardiaca(SensorBiologico):
         else:
             return "Normal"
 
-# ---------------------------
-# Subclase: SensorPresionArterial
-# ---------------------------
+
 class SensorPresionArterial(SensorBiologico):
     def __init__(self):
         super().__init__("Presión arterial", "mmHg")
@@ -176,7 +167,7 @@ class SensorPresionArterial(SensorBiologico):
     def leerValor(self):
         self.__sistolica = random.randint(80, 160)
         self.__diastolica = random.randint(50, min(self.__sistolica - 10, 100))
-        self._valorActual = self.__sistolica  # Valor principal para compatibilidad
+        self._valorActual = self.__sistolica
         return self.__sistolica
 
     def esCritico(self):
@@ -196,6 +187,7 @@ class SensorPresionArterial(SensorBiologico):
         es_critico = valor_dif < 30 or valor_dif > 70
         return valor_dif, es_critico
 
+
 # ---------------------------
 # Clase: ControladorDosis
 # ---------------------------
@@ -207,7 +199,7 @@ class ControladorDosis:
 
     def evaluarParametros(self):
         for sensor in self.__sensores:
-            valor = sensor.leerValor()
+            valor = sensor.getValorActual()
             tipo = sensor.getTipo()
             unidad = sensor.getUnidad()
 
@@ -229,10 +221,10 @@ class ControladorDosis:
 
             self.__historial.append(f"{tipo} estable: {valor:.2f} {unidad}")
 
-    def ajustarDosisAutomaticamente(self): # Lógica adaptativa según los valores de sensores
+    def ajustarDosisAutomaticamente(self):
         for sensor in self.__sensores:
             if isinstance(sensor, SensorGlucosa):
-                valor = sensor.leerValor()
+                valor = sensor.getValorActual()
                 velocidad_actual = self.__bomba.getVelocidad()
                 if valor > 180:
                     self.__bomba.ajustarVelocidad(velocidad_actual + 5)
@@ -245,13 +237,13 @@ class ControladorDosis:
         self.__bomba.detener()
         self.__historial.append("Emergencia: bomba detenida.")
 
-    # Método privado 
-    def __generarAlerta(self, mensaje): 
+    def __generarAlerta(self, mensaje):
         print(f"[ALERTA] {mensaje}")
         self.__historial.append(f"Alerta generada: {mensaje}")
 
     def obtenerHistorial(self):
         return self.__historial
+
 
 # ---------------------------
 # Clase: Paciente
@@ -273,8 +265,9 @@ class Paciente:
     def obtenerDatosFisiologicos(self):
         print(f"\n📊 Datos fisiológicos de {self.__nombre}:")
         for sensor in self.__sensores:
-            valor = sensor.leerValor()
+            sensor.leerValor()
             tipo = sensor.getTipo()
+            valor = sensor.getValorActual()
             if tipo == "Presión arterial":
                 dif, _ = sensor.diferencial()
                 print(f"- {tipo}: {valor} mmHg ({sensor.clasificarPresion()}), Diferencial: {dif:.2f} mmHg")
@@ -284,6 +277,7 @@ class Paciente:
                 print(f"- {tipo}: {valor} bpm ({sensor.clasificarRitmo()})")
             else:
                 print(f"- {tipo}: {valor}")
+
 
 # ---------------------------
 # SIMULACIÓN
@@ -301,7 +295,7 @@ paciente.vincularSensor(sensor_glucosa)
 paciente.vincularSensor(sensor_frecuencia)
 paciente.vincularSensor(sensor_presion)
 
-# Obtener datos fisiológicos
+# Obtener datos fisiológicos (solo una lectura)
 paciente.obtenerDatosFisiologicos()
 
 # Crear bomba y configurarla
@@ -309,9 +303,8 @@ bomba = BombaInfusionInteligente()
 bomba.configurarInfusion(tipo="Insulina", velocidad=20, volumen=100, umbralMin=10, umbralMax=50)
 bomba.iniciar()
 
-# Crear controlador
+# Crear controlador y evaluar
 controlador = ControladorDosis(bomba, paciente.obtenerSensores())
-# Evaluar y ajustar
 controlador.evaluarParametros()
 controlador.ajustarDosisAutomaticamente()
 
