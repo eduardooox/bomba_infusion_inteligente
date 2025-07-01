@@ -1,6 +1,6 @@
 # 💉 Diseño POO de Controlador Inteligente de Infusión Intravenosa
 
-Este proyecto simula una **bomba de infusión intravenosa inteligente**, capaz de adaptarse automáticamente a las condiciones fisiológicas de un paciente virtual. Utiliza sensores para medir glucosa, frecuencia cardíaca y presión arterial, y regula la administración de medicamentos en consecuencia.
+Este proyecto simula un **controlador de infusión intravenosa inteligente**, capaz de adaptarse automáticamente a las condiciones fisiológicas de un paciente virtual. Utiliza sensores para medir glucosa, frecuencia cardíaca y presión arterial, y regula la administración de medicamentos en consecuencia.
 
 ---
 
